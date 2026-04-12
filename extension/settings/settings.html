@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- Settings page for ContextBridge — configure backend URL and API key. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ContextBridge — Settings</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: #1a1a2e;
+      background: #f9fafb;
+      min-height: 100vh;
+    }
+    .page { max-width: 480px; margin: 40px auto; padding: 0 16px; }
+    h1 { font-size: 20px; font-weight: 700; color: #4F46E5; margin-bottom: 24px; }
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    label { display: flex; flex-direction: column; gap: 5px; }
+    label span { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+    input {
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus { border-color: #4F46E5; }
+    .hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    .save-btn {
+      padding: 9px 18px;
+      background: #4F46E5;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: background 0.15s;
+    }
+    .save-btn:hover { background: #4338ca; }
+    .toast {
+      display: none;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #16a34a;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>ContextBridge Settings</h1>
+    <div class="card">
+      <label>
+        <span>Backend URL</span>
+        <input type="url" id="backend-url" placeholder="http://localhost:3001" />
+        <p class="hint">URL of your running ContextBridge backend server.</p>
+      </label>
+      <label>
+        <span>API Key</span>
+        <input type="password" id="api-key" placeholder="your_static_api_key_here" />
+        <p class="hint">Must match API_KEY in your backend .env file.</p>
+      </label>
+      <button class="save-btn" id="save-btn">Save Settings</button>
+      <div class="toast" id="toast">Settings saved.</div>
+    </div>
+  </div>
+  <script src="settings.js"></script>
+</body>
+</html>
