@@ -34,7 +34,7 @@ export async function testConnection() {
 }
 
 export async function saveSession(userId, sourceModel, rawMessages, structuredContext) {
-  const { title, summary, goals, constraints, decisions, assumptions, tech_stack, architecture, open_questions, key_entities } = structuredContext;
+  const { title, summary, goals, constraints, decisions, assumptions, tech_stack, architecture, open_questions, key_entities, timeline } = structuredContext;
 
   const result = await query(
     `INSERT INTO contexts (user_id, source_model, title, raw_messages, structured_context)
@@ -45,7 +45,7 @@ export async function saveSession(userId, sourceModel, rawMessages, structuredCo
       sourceModel,
       title,
       JSON.stringify(rawMessages),
-      JSON.stringify({ summary, goals, constraints, decisions, assumptions, tech_stack, architecture, open_questions, key_entities }),
+      JSON.stringify({ summary, goals, constraints, decisions, assumptions, tech_stack, architecture, open_questions, key_entities, timeline }),
     ]
   );
 

@@ -42,7 +42,9 @@ router.post('/inject', async (req, res, next) => {
       includeArchitecture: include.architecture !== false,
       includeOpenQuestions: include.open_questions !== false,
       includeKeyEntities: include.key_entities !== false,
+      includeTimeline: include.timeline !== false,
       includeSummary: include.summary !== false,
+      showImportance: true,
       maxTokens: 4000,
     };
 

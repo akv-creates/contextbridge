@@ -1,4 +1,4 @@
-// Adapter for GPT — formats a context bundle as a plain prose system message with dash section headers.
+// Adapter for GPT — formats a context bundle as a system message with dash section headers.
 
 function renderSection(lines, header, items) {
   if (items && items.length > 0) {
@@ -10,7 +10,8 @@ function renderSection(lines, header, items) {
 
 export function formatForGPT(contextBundle) {
   const lines = [
-    'You are continuing work on an existing project. Here is the full context from previous sessions:',
+    '=== CONTEXT BRIDGE: Previous Session Context ===',
+    'The following is structured context extracted from a previous AI conversation. Use it to maintain continuity.',
     '',
   ];
 
@@ -22,14 +23,17 @@ export function formatForGPT(contextBundle) {
 
   renderSection(lines, 'Goals', contextBundle.goals);
   renderSection(lines, 'Constraints', contextBundle.constraints);
-  renderSection(lines, 'Decisions', contextBundle.decisions);
+  renderSection(lines, 'Decisions Made', contextBundle.decisions);
   renderSection(lines, 'Tech Stack', contextBundle.tech_stack);
   renderSection(lines, 'Architecture', contextBundle.architecture);
+  renderSection(lines, 'Timeline', contextBundle.timeline);
   renderSection(lines, 'Open Questions', contextBundle.open_questions);
+  renderSection(lines, 'Assumptions & Caveats', contextBundle.assumptions);
   renderSection(lines, 'Key Entities', contextBundle.key_entities);
-  renderSection(lines, 'Assumptions', contextBundle.assumptions);
 
-  lines.push('Acknowledge you have read the context and ask the user what they want to work on next.');
+  lines.push('=== END CONTEXT ===');
+  lines.push('');
+  lines.push('You now have full context from a previous session. Confirm you understand the project state, then ask what the user wants to work on next. Pay special attention to items marked [CRITICAL] and any open questions.');
 
   return lines.join('\n');
 }

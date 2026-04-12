@@ -10,7 +10,7 @@ function renderSection(lines, header, items) {
 
 export function formatForOllama(contextBundle) {
   const lines = [
-    'You are continuing work on an existing project. Here is the full context from previous sessions:',
+    'CONTEXT FROM PREVIOUS SESSION:',
     '',
   ];
 
@@ -25,11 +25,11 @@ export function formatForOllama(contextBundle) {
   renderSection(lines, 'DECISIONS', contextBundle.decisions);
   renderSection(lines, 'TECH STACK', contextBundle.tech_stack);
   renderSection(lines, 'ARCHITECTURE', contextBundle.architecture);
+  renderSection(lines, 'TIMELINE', contextBundle.timeline);
   renderSection(lines, 'OPEN QUESTIONS', contextBundle.open_questions);
-  renderSection(lines, 'KEY ENTITIES', contextBundle.key_entities);
   renderSection(lines, 'ASSUMPTIONS', contextBundle.assumptions);
 
-  lines.push('Acknowledge you have read the context and ask the user what they want to work on next.');
+  lines.push('Confirm you understand, then ask what to work on next.');
 
   return lines.join('\n');
 }

@@ -38,6 +38,7 @@ router.post('/capture', async (req, res, next) => {
       ...structured.architecture.map(toText),
       ...structured.open_questions.map(toText),
       ...structured.key_entities.map(toText),
+      ...structured.timeline.map(toText),
     ].filter(Boolean).join(' ');
 
     if (embeddingText.trim()) {
@@ -63,6 +64,7 @@ router.post('/capture', async (req, res, next) => {
       architecture: structured.architecture.map(toText),
       open_questions: structured.open_questions.map(toText),
       key_entities: structured.key_entities.map(toText),
+      timeline: structured.timeline.map(toText),
       token_count: tokenCount,
     });
   } catch (err) {
