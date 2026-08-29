@@ -85,6 +85,4 @@ node test/qa-suite.mjs   # requires the backend + Ollama running
 | `extension/manifest.json` | `oauth2.client_id` for Google API capture (optional) |
 | Extension settings page | Point the extension at a non-default backend URL |
 
-## License
 
-[Add your license here.]
