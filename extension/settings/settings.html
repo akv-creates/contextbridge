@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Settings page for ContextBridge — configure backend URL and API key. -->
+<!-- Settings page for ConteXetu — configure backend URL and API key. -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ContextBridge — Settings</title>
+  <title>ConteXetu — Settings</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -15,7 +15,7 @@
       min-height: 100vh;
     }
     .page { max-width: 480px; margin: 40px auto; padding: 0 16px; }
-    h1 { font-size: 20px; font-weight: 700; color: #4F46E5; margin-bottom: 24px; }
+    h1 { font-size: 20px; font-weight: 700; color: #8b5cf6; margin-bottom: 24px; }
     .card {
       background: #fff;
       border: 1px solid #e5e7eb;
@@ -35,11 +35,11 @@
       outline: none;
       transition: border-color 0.15s;
     }
-    input:focus { border-color: #4F46E5; }
+    input:focus { border-color: #8b5cf6; }
     .hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
     .save-btn {
       padding: 9px 18px;
-      background: #4F46E5;
+      background: #8b5cf6;
       color: #fff;
       border: none;
       border-radius: 6px;
@@ -49,7 +49,7 @@
       align-self: flex-start;
       transition: background 0.15s;
     }
-    .save-btn:hover { background: #4338ca; }
+    .save-btn:hover { background: #7c3aed; }
     .toast {
       display: none;
       margin-top: 10px;
@@ -60,16 +60,31 @@
       font-size: 12px;
       color: #16a34a;
     }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .toggle-row-text { display: flex; flex-direction: column; gap: 3px; }
+    .toggle-row-text span { font-size: 13px; font-weight: 600; color: #1a1a2e; text-transform: none; letter-spacing: normal; }
+    .toggle-switch { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #d1d5db; border-radius: 22px; transition: background 0.15s;
+    }
+    .toggle-slider::before {
+      content: ""; position: absolute; height: 16px; width: 16px; left: 3px; top: 3px;
+      background: white; border-radius: 50%; transition: transform 0.15s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: #8b5cf6; }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
   </style>
 </head>
 <body>
   <div class="page">
-    <h1>ContextBridge Settings</h1>
+    <h1>ConteXetu Settings</h1>
     <div class="card">
       <label>
         <span>Backend URL</span>
         <input type="url" id="backend-url" placeholder="http://localhost:3001" />
-        <p class="hint">URL of your running ContextBridge backend server.</p>
+        <p class="hint">URL of your running ConteXetu backend server.</p>
       </label>
       <label>
         <span>API Key</span>
@@ -78,6 +93,18 @@
       </label>
       <button class="save-btn" id="save-btn">Save Settings</button>
       <div class="toast" id="toast">Settings saved.</div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="toggle-row">
+        <div class="toggle-row-text">
+          <span>Anonymous usage stats</span>
+          <p class="hint">Helps us know which features are actually used. Never includes message content, session titles, or anything you've captured — only event names like "inject succeeded" and a random device ID.</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="telemetry-toggle" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
     </div>
   </div>
   <script src="settings.js"></script>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Popup UI for ContextBridge extension — entry point shown on extension icon click. -->
+<!-- Popup UI for ConteXetu extension — entry point shown on extension icon click. -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ContextBridge</title>
+  <title>ConteXetu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,9 +15,45 @@
     <!-- Header -->
     <header class="header">
       <div class="logo-group">
-        <div class="logo-icon">CB</div>
-        <span class="logo">ContextBridge</span>
+        <span class="logo-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="popupArcTop" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#a855f7"/>
+                <stop offset="100%" stop-color="#38bdf8"/>
+              </linearGradient>
+              <linearGradient id="popupArcBottom" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ec4899"/>
+                <stop offset="100%" stop-color="#2563eb"/>
+              </linearGradient>
+              <linearGradient id="popupXGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#d946ef"/>
+                <stop offset="50%" stop-color="#a855f7"/>
+                <stop offset="100%" stop-color="#38bdf8"/>
+              </linearGradient>
+            </defs>
+            <g fill="none" stroke-linecap="round">
+              <path d="M 40 22 A 42 42 0 0 1 88 22" stroke="url(#popupArcTop)" stroke-width="11"/>
+              <path d="M 40 106 A 42 42 0 0 1 25 78" stroke="url(#popupArcBottom)" stroke-width="11"/>
+              <path d="M 88 106 A 42 42 0 0 0 103 78" stroke="url(#popupArcBottom)" stroke-width="11"/>
+            </g>
+            <g stroke="url(#popupXGrad)" stroke-width="15" stroke-linecap="round">
+              <line x1="46" y1="46" x2="82" y2="82"/>
+              <line x1="82" y1="46" x2="46" y2="82"/>
+            </g>
+          </svg>
+        </span>
+        <span class="logo-stack">
+          <span class="logo">ConteXetu</span>
+          <span class="logo-tagline">Your AI conversations, portable</span>
+        </span>
       </div>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle theme (auto / light / dark)">
+        <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+      </button>
       <a href="../settings/settings.html" target="_blank" class="settings-link" title="Settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
@@ -28,6 +64,26 @@
 
     <!-- Main content -->
     <div class="main-content">
+      <!-- First-run / backend-offline onboarding -->
+      <div class="onboarding-card" id="onboarding-card" style="display:none">
+        <div class="onboarding-title">
+          <span class="onboarding-spark">&#10024;</span>
+          Get set up in 2 minutes
+        </div>
+        <ol class="onboarding-steps">
+          <li><strong>Start the backend</strong> — run <code>npm start</code> in the <code>backend/</code> folder (or <code>docker compose up</code>).</li>
+          <li><strong>Capture</strong> — open a ChatGPT or Claude chat and click <em>Capture Context</em>.</li>
+          <li><strong>Inject anywhere</strong> — open any session below and send it to Claude, ChatGPT, Gemini, or Ollama.</li>
+        </ol>
+        <div class="onboarding-privacy">
+          &#128274; Emails, keys &amp; names are redacted on-device before anything leaves your machine.
+        </div>
+        <div class="onboarding-actions">
+          <a href="../settings/settings.html" target="_blank" class="onboarding-settings-btn">Open Settings</a>
+          <button class="onboarding-dismiss-btn" id="onboarding-dismiss" type="button">Dismiss</button>
+        </div>
+      </div>
+
       <!-- Active tab badge -->
       <div class="tab-badge" id="tab-badge">
         <span class="badge-dot" id="badge-dot"></span>
@@ -44,9 +100,71 @@
         Capture Context
       </button>
 
+      <!-- Paste input for Claude / manual conversations -->
+      <div class="paste-section" id="paste-section" style="display:none">
+        <div class="paste-label">Paste your conversation below:</div>
+        <textarea class="paste-input" id="paste-input" rows="6" placeholder="Copy messages from Claude or any AI chat and paste here...&#10;&#10;Format: just paste the conversation text — we'll parse it automatically."></textarea>
+        <div class="parse-preview" id="parse-preview" style="display:none"></div>
+        <button class="capture-btn paste-capture-btn" id="paste-capture-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Process Pasted Text
+        </button>
+      </div>
+
+      <!-- Document capture — upload a .docx / .pptx to extract context -->
+      <div class="doc-section" id="doc-section">
+        <button class="doc-toggle" id="doc-toggle" type="button">
+          <span class="doc-toggle-icon">📄</span>
+          <span class="doc-toggle-text">Capture from Doc / PPT</span>
+          <span class="doc-toggle-caret" id="doc-toggle-caret">&#8595;</span>
+        </button>
+        <div class="doc-body hidden" id="doc-body">
+          <label class="doc-dropzone" id="doc-dropzone" for="doc-file-input">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span id="doc-dropzone-text">Drop a .docx or .pptx, or click to browse</span>
+          </label>
+          <input type="file" id="doc-file-input" accept=".docx,.pptx" style="display:none" />
+          <div class="doc-hint">Extracted text is redacted on-device (same privacy gate as chat capture) before any cloud structuring.</div>
+        </div>
+      </div>
+
       <!-- Status area -->
       <div class="status-area" id="status-area"></div>
     </div>
+
+    <!-- Smart Slice composer -->
+    <section class="slice-composer" id="slice-composer">
+      <button class="slice-toggle" id="slice-toggle" type="button">
+        <span class="slice-toggle-icon">&#128173;</span>
+        <span class="slice-toggle-text">Smart Slice — ask a question first</span>
+        <span class="slice-toggle-caret" id="slice-toggle-caret">&#8595;</span>
+      </button>
+      <div class="slice-body hidden" id="slice-body">
+        <textarea id="slice-query" class="slice-query" rows="2" placeholder="What are you about to ask? (e.g., &quot;How should offline mode work for volunteers?&quot;)"></textarea>
+        <div class="slice-actions">
+          <select id="slice-target" class="slice-target">
+            <option value="claude">Claude</option>
+            <option value="chatgpt">ChatGPT</option>
+            <option value="gemini">Gemini</option>
+            <option value="ollama">Ollama</option>
+            <option value="markdown">Copy as .md</option>
+          </select>
+          <button id="slice-run" class="capture-btn slice-run-btn" type="button" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Smart Slice
+          </button>
+        </div>
+        <div class="slice-hint" id="slice-hint"></div>
+      </div>
+    </section>
 
     <!-- Session list -->
     <section class="sessions-section">
@@ -54,21 +172,45 @@
         Saved Sessions
         <span class="sessions-count" id="sessions-count" style="display:none">0</span>
       </h3>
+      <!-- Folder rail: chip strip. Populated by renderFolderChips(). -->
+      <div class="folder-rail" id="folder-rail"></div>
       <div class="sessions-list" id="sessions-list">
-        <p class="empty-state">
-          <span class="empty-state-icon">&#128203;</span>
-          No sessions yet. Capture a conversation to get started.
-        </p>
+        <div class="empty-state empty-state-rich">
+          <div class="empty-flow">
+            <span class="empty-flow-node">&#128172;</span>
+            <span class="empty-flow-arrow">&#8594;</span>
+            <span class="empty-flow-node empty-flow-x">&#10005;</span>
+            <span class="empty-flow-arrow">&#8594;</span>
+            <span class="empty-flow-node">&#10024;</span>
+          </div>
+          <div class="empty-state-title">No sessions yet</div>
+          <div class="empty-state-sub">Capture a ChatGPT or Claude conversation once &mdash; reuse it in any AI, forever.</div>
+        </div>
       </div>
     </section>
+
+    <!-- Pro upsell — fake-door demand test. Hidden until there's something
+         to upsell against (savings > 0 or 3+ sessions captured). -->
+    <div class="pro-banner" id="pro-banner" style="display:none">
+      <div class="pro-banner-text">
+        <span class="pro-banner-icon">✨</span>
+        <span id="pro-banner-copy">Upgrade to Pro for unlimited Smart Slice</span>
+      </div>
+      <button class="pro-banner-btn" id="pro-banner-btn">Upgrade</button>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
       <span class="conn-dot" id="conn-dot"></span>
       <span id="conn-status">Checking connection...</span>
+      <span class="savings-chip" id="savings-chip" style="display:none" title="Tokens saved this month via Smart Slice">
+        <span class="savings-chip-icon">&#9889;</span>
+        <span id="savings-chip-text">0 saved</span>
+      </span>
     </footer>
   </div>
 
+  <script src="../telemetry.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

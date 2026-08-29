@@ -102,3 +102,62 @@ export function assembleBundle(structuredContext, options = {}) {
 function estimateTokens(bundle) {
   return Math.ceil(JSON.stringify(bundle).length / 4);
 }
+
+// ── Merge multiple structured contexts ──────────────────────────────────────
+
+// Jaccard word-overlap similarity for deduplication.
+function jaccardSimilarity(a, b) {
+  const wordsA = new Set(a.toLowerCase().split(/\s+/));
+  const wordsB = new Set(b.toLowerCase().split(/\s+/));
+  let intersection = 0;
+  for (const w of wordsA) { if (wordsB.has(w)) intersection++; }
+  const union = wordsA.size + wordsB.size - intersection;
+  return union === 0 ? 0 : intersection / union;
+}
+
+function deduplicateItems(items) {
+  const result = [];
+  for (const item of items) {
+    const text = toText(item);
+    const isDuplicate = result.some(function(existing) {
+      return jaccardSimilarity(toText(existing), text) > 0.85;
+    });
+    if (!isDuplicate) {
+      result.push(item);
+    } else {
+      // Keep the more detailed version (longer text or higher importance)
+      const idx = result.findIndex(function(existing) {
+        return jaccardSimilarity(toText(existing), text) > 0.85;
+      });
+      if (idx !== -1) {
+        const existingText = toText(result[idx]);
+        if (text.length > existingText.length || toImportance(item) > toImportance(result[idx])) {
+          result[idx] = item;
+        }
+      }
+    }
+  }
+  return result;
+}
+
+export function mergeContexts(contexts, title) {
+  const ARRAY_KEYS = ['goals', 'constraints', 'decisions', 'assumptions', 'tech_stack', 'architecture', 'open_questions', 'key_entities', 'timeline'];
+
+  const merged = {
+    title: title || contexts[0]?.title || 'Merged Session',
+    summary: 'Merged context from ' + contexts.length + ' sessions. ' +
+      contexts.map(function(c) { return c.summary || ''; }).filter(Boolean).join(' | '),
+  };
+
+  for (const key of ARRAY_KEYS) {
+    const allItems = [];
+    for (const ctx of contexts) {
+      if (ctx[key] && Array.isArray(ctx[key])) {
+        allItems.push(...ctx[key]);
+      }
+    }
+    merged[key] = deduplicateItems(allItems);
+  }
+
+  return merged;
+}

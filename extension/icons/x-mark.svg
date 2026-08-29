@@ -1,0 +1,29 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="arcTop" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="arcBottom" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="xGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d946ef"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="#050505"/>
+  <!-- four corner arcs forming a broken ring, echoing the ConteXetu hub mark -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M 40 22 A 42 42 0 0 1 88 22" stroke="url(#arcTop)" stroke-width="11"/>
+    <path d="M 40 106 A 42 42 0 0 1 25 78" stroke="url(#arcBottom)" stroke-width="11"/>
+    <path d="M 88 106 A 42 42 0 0 0 103 78" stroke="url(#arcBottom)" stroke-width="11"/>
+  </g>
+  <!-- central X -->
+  <g stroke="url(#xGrad)" stroke-width="15" stroke-linecap="round">
+    <line x1="46" y1="46" x2="82" y2="82"/>
+    <line x1="82" y1="46" x2="46" y2="82"/>
+  </g>
+</svg>

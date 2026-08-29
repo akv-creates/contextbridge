@@ -23,6 +23,18 @@ services:
       - postgres
     env_file:
       - ./backend/.env
+    environment:
+      # Inside the Compose network the backend reaches Postgres by service
+      # name, not localhost — overrides whatever DATABASE_URL is in .env
+      # (which is meant for running `npm start` directly on the host).
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/contextbridge
+      # Ollama runs natively on the host (not containerized here), so the
+      # backend container must reach it via host.docker.internal, not
+      # localhost. extra_hosts below makes this resolve on Linux too —
+      # Docker Desktop (Mac/Windows) supports it out of the box.
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "3001:3001"
     volumes:

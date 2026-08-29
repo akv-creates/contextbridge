@@ -5,11 +5,13 @@ function init() {
   const apiKeyInput = document.getElementById('api-key');
   const saveBtn = document.getElementById('save-btn');
   const toast = document.getElementById('toast');
+  const telemetryToggle = document.getElementById('telemetry-toggle');
 
   // Load existing settings.
-  chrome.storage.local.get(['BACKEND_URL', 'API_KEY'], (result) => {
+  chrome.storage.local.get(['BACKEND_URL', 'API_KEY', 'cb_telemetry_enabled'], (result) => {
     if (result.BACKEND_URL) backendInput.value = result.BACKEND_URL;
     if (result.API_KEY) apiKeyInput.value = result.API_KEY;
+    telemetryToggle.checked = result.cb_telemetry_enabled !== false; // default ON
   });
 
   saveBtn.addEventListener('click', () => {
@@ -20,6 +22,10 @@ function init() {
       toast.style.display = 'block';
       setTimeout(() => { toast.style.display = 'none'; }, 2500);
     });
+  });
+
+  telemetryToggle.addEventListener('change', () => {
+    chrome.storage.local.set({ cb_telemetry_enabled: telemetryToggle.checked });
   });
 }
 

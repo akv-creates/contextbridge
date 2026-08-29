@@ -1,35 +1,27 @@
-// FAISS vector store — embeds session text via local transformers (free, no API needed).
+// FAISS vector store — session-level similarity search over MiniLM embeddings.
+// Embedding loader lives in ../memory/embeddings.js so item-level retrieval
+// (Smart Slice) can reuse the same model singleton.
 
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import { embed, EMBEDDING_DIMS } from './embeddings.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.resolve(__dirname, '../data');
 const INDEX_PATH = path.join(DATA_DIR, 'faiss.index');
 const META_PATH = path.join(DATA_DIR, 'faiss.meta.json');
 
-// all-MiniLM-L6-v2 produces 384-dim vectors — fast, free, runs locally.
-const EMBEDDING_DIMS = 384;
-const EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2';
-
 let faissIndex = null;
-let embedder = null;
 let metadata = [];
-
-async function getEmbedder() {
-  if (!embedder) {
-    const { pipeline } = await import('@xenova/transformers');
-    console.log('[faiss] Loading local embedding model (first run downloads ~25MB)...');
-    embedder = await pipeline('feature-extraction', EMBEDDING_MODEL);
-    console.log('[faiss] Embedding model ready');
-  }
-  return embedder;
-}
 
 async function getFaiss() {
   if (!faissIndex) {
-    const { IndexFlatL2 } = await import('faiss-node');
+    // faiss-node only exposes a CJS default export — named destructuring
+    // from the dynamic import (`{ IndexFlatL2 }`) silently resolves to
+    // undefined, so we have to reach into `.default`.
+    const faissModule = await import('faiss-node');
+    const { IndexFlatL2 } = faissModule.default || faissModule;
 
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -53,13 +45,6 @@ async function getFaiss() {
     }
   }
   return faissIndex;
-}
-
-async function embed(text) {
-  const pipe = await getEmbedder();
-  const output = await pipe(text.slice(0, 512), { pooling: 'mean', normalize: true });
-  // output.data is a Float32Array of length 384
-  return Array.from(output.data);
 }
 
 function persistIndex(index) {

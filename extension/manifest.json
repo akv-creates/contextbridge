@@ -1,24 +1,54 @@
 {
   "manifest_version": 3,
-  "name": "ContextBridge",
-  "version": "1.0.0",
-  "description": "Capture AI conversation context and transfer it between models without copy-paste.",
+  "name": "ConteXetu — Portable AI Memory",
+  "version": "1.1.0",
+  "description": "Never re-explain your project to an AI again. Capture context from ChatGPT & Claude, redact PII on-device, inject anywhere.",
   "permissions": [
     "activeTab",
     "scripting",
     "storage",
-    "tabs"
+    "tabs",
+    "notifications",
+    "downloads",
+    "identity"
   ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+B",
+        "mac": "Alt+Shift+B"
+      },
+      "description": "Open ConteXetu popup"
+    },
+    "capture-context": {
+      "suggested_key": {
+        "default": "Alt+Shift+C",
+        "mac": "Alt+Shift+C"
+      },
+      "description": "Capture current ChatGPT or Gemini conversation"
+    }
+  },
   "host_permissions": [
     "https://chatgpt.com/*",
-    "https://claude.ai/*"
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://docs.google.com/*",
+    "https://docs.googleapis.com/*",
+    "https://slides.googleapis.com/*"
   ],
+  "oauth2": {
+    "client_id": "721533210140-h9bo9j9tjrlereubagjh8ipe24i6v7a1.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/documents.readonly",
+      "https://www.googleapis.com/auth/presentations.readonly"
+    ]
+  },
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "ContextBridge"
+    "default_title": "ConteXetu"
   },
   "content_scripts": [
     {
@@ -29,6 +59,21 @@
     {
       "matches": ["https://claude.ai/*"],
       "js": ["content/claude.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://gemini.google.com/*"],
+      "js": ["content/gemini.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*",
+        "https://docs.google.com/*"
+      ],
+      "js": ["content/floating-bridge.js"],
       "run_at": "document_idle"
     }
   ],
